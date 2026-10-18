@@ -444,7 +444,7 @@ document.getElementById('yr').textContent = new Date().getFullYear();
     clear: () => out.innerHTML = '',
     sudo: () => print('nice try. this incident will be reported. 🚨', 'err'),
     echo: a => print(esc(a||'')),
-    exit: () => print('there is no escape. 😎'),
+    exit: () => print('there is no escape.'),
   };
   const run = raw => {
     print(`<span class="ps">aurel@github:~$</span> ${esc(raw)}`);
