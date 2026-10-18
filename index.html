@@ -122,6 +122,9 @@ section{padding:clamp(70px,10vw,120px) clamp(16px,5vw,48px);max-width:1180px;mar
 .tag{border:1px solid var(--border);padding:2px 8px;border-radius:3px;color:var(--fg)}
 .tag.lang{color:var(--amber);border-color:rgba(255,197,61,.35)}
 .tag.priv{color:var(--red);border-color:rgba(255,77,109,.35)}
+.card .live{margin-top:12px;font-size:.75rem;color:var(--cyan);word-break:break-all}
+.tag.code-link{cursor:pointer;transition:all .2s}
+.tag.code-link:hover{background:var(--green);color:var(--bg);border-color:var(--green)}
 .card .open{position:absolute;right:18px;bottom:18px;color:var(--green);opacity:0;transform:translateX(-8px);transition:all .3s}
 .card:hover .open{opacity:1;transform:none}
 
@@ -308,7 +311,7 @@ body.arcade #term input{font-family:'VT323',monospace}
 <script>
 const GH = 'https://github.com/ASchenkl/';
 const PROJECTS = [
-  {name:'Shoooter-2D', cat:'game', icon:'🔫', lang:'JavaScript', priv:false, desc:'2D shooting game with pixel graphics, built with help from Claude by Anthropic.'},
+  {name:'Shoooter-2D', cat:'game', icon:'🔫', lang:'JavaScript', priv:false, url:'https://aschenkl.github.io/Shoooter-2D/', desc:'2D shooting game with pixel graphics, built with help from Claude by Anthropic.'},
   {name:'battleship-with-AI', cat:'game', icon:'🚢', lang:'Python', priv:false, desc:'The classic Battleship – but you play against an AI opponent.'},
   {name:'spaceshooter', cat:'game', icon:'🚀', lang:'TypeScript', priv:true, desc:'Arcade space shooter: dodge, shoot, survive.'},
   {name:'Stickman-fight', cat:'game', icon:'🥋', lang:'Game', priv:true, desc:'Fast-paced stickman fighting game.'},
@@ -378,13 +381,18 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const grid = document.getElementById('grid');
 PROJECTS.forEach((p,i) => {
   const a = document.createElement('a');
-  a.className = 'card reveal'; a.href = GH + p.name; a.target = '_blank'; a.rel = 'noopener';
+  a.className = 'card reveal'; a.href = p.url || GH + p.name; a.target = '_blank'; a.rel = 'noopener';
   a.dataset.cat = p.cat; a.style.transitionDelay = (i%3)*80 + 'ms';
   a.innerHTML = `<div class="top"><span class="icon">${p.icon}</span><span>${p.cat}/</span></div>
     <h3>${p.name}</h3><p>${p.desc}</p>
-    <div class="meta"><span class="tag lang">${p.lang}</span>${p.priv?'<span class="tag priv">private</span>':'<span class="tag">public</span>'}</div>
-    <span class="open">open ↗</span>`;
+    ${p.url ? `<div class="live">▶ ${p.url.replace(/^https?:\/\//,'').replace(/\/$/,'')}</div>` : ''}
+    <div class="meta"><span class="tag lang">${p.lang}</span>${p.priv?'<span class="tag priv">private</span>':'<span class="tag">public</span>'}${p.url ? `<span class="tag code-link" data-href="${GH+p.name}">&lt;/&gt; code</span>` : ''}</div>
+    <span class="open">${p.url ? 'play ▶' : 'code ↗'}</span>`;
   grid.appendChild(a);
+});
+grid.addEventListener('click', e => {
+  const c = e.target.closest('.code-link'); if(!c) return;
+  e.preventDefault(); open(c.dataset.href, '_blank', 'noopener');
 });
 document.querySelectorAll('.card').forEach(card => {
   card.addEventListener('mousemove', e => {
@@ -447,6 +455,7 @@ document.getElementById('yr').textContent = new Date().getFullYear();
   <span class="g">whoami</span>       who is this guy?
   <span class="g">projects</span>     list all repositories
   <span class="g">open</span> &lt;name&gt;  open a repository on GitHub
+  <span class="g">play</span> &lt;name&gt;  launch the live version of a project
   <span class="g">skills</span>       show skills
   <span class="g">github</span>       open my GitHub profile
   <span class="g">matrix</span>       enter the matrix
@@ -459,7 +468,16 @@ document.getElementById('yr').textContent = new Date().getFullYear();
   <span class="g">clear</span>        clear the screen
 <span class="a">…and a few secret ones. good luck.</span>`),
     whoami: () => print('Aurel Schenkl – developer &amp; game creator. Python, JavaScript, TypeScript.'),
-    projects: () => print(PROJECTS.map(p => `<span class="a">${p.icon}</span> <a class="g" href="${GH+p.name}" target="_blank" rel="noopener">${p.name.padEnd(22)}</a> ${p.lang}`).join('\n')),
+    projects: () => print(PROJECTS.map(p => `<span class="a">${p.icon}</span> <a class="g" href="${GH+p.name}" target="_blank" rel="noopener">${p.name.padEnd(22)}</a> ${p.lang.padEnd(11)}${p.url ? ` <a class="ps" href="${p.url}" target="_blank" rel="noopener">▶ live</a>` : ''}`).join('\n')),
+    play: a => {
+      const live = PROJECTS.filter(p => p.url);
+      if(!a) return print('usage: play &lt;project&gt;\nlive projects: ' + live.map(p => `<span class="g">${p.name}</span>`).join(', '));
+      const p = PROJECTS.find(p => p.name.toLowerCase().startsWith(a.toLowerCase()));
+      if(!p) return print(`play: project not found: ${esc(a)}`, 'err');
+      if(!p.url) return print(`${p.name} has no live version yet. try: <span class="g">open ${p.name}</span>`, 'err');
+      print(`launching ${p.name} ...`); open(p.url, '_blank');
+    },
+    run: a => CMDS.play(a),
     ls: () => CMDS.projects(),
     skills: () => print(Object.values(SK).flat().map(([n,v]) => `${n.padEnd(20)} <span class="g">${'█'.repeat(Math.round(v/10))}</span>${'░'.repeat(10-Math.round(v/10))} ${v}%`).join('\n')),
     github: () => { print('opening github.com/ASchenkl ...'); open(GH.slice(0,-1),'_blank'); },
