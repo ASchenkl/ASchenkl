@@ -941,8 +941,10 @@ window.eggs = (() => {
     const pl = {x:W/2, y:H-70, lives:3, inv:0, cd:0};
     const keys = {};
     let shots = [], bombs = [], sparks = [], enemies = [], boss = null, stage = 'intro', t = 0, st = 0, score = 0, dir = 1, raf;
-    const cols = Math.min(PROJECTS.length, W < 600 ? 3 : 5), gapX = Math.min(160, (W-60)/cols), gapY = eh + 40;
-    PROJECTS.forEach((p,i) => enemies.push({x:(W-(cols-1)*gapX)/2 + (i%cols)*gapX - ew/2, y:90 + Math.floor(i/cols)*gapY, name:p.name, alive:true}));
+    // classic invader block: rows x cols, one color per row
+    const cols = W < 600 ? 6 : 10, rows = 4, gapX = Math.min(ew + 26, (W - 80) / cols), gapY = eh + 18;
+    for(let r=0;r<rows;r++) for(let c=0;c<cols;c++)
+      enemies.push({x:(W - (cols-1)*gapX)/2 + c*gapX - ew/2, y:90 + r*gapY, row:r, alive:true});
     const total = enemies.length;
     const kd = e => {
       if(e.key === 'Escape') return end('quit');
@@ -989,14 +991,12 @@ window.eggs = (() => {
         alive.forEach(e => e.x += dir*speed);
         if(alive.some(e => e.x < 16 || e.x + ew > W-16)){ dir *= -1; alive.forEach(e => e.y += 14); }
         if(alive.some(e => e.y + eh > pl.y - 6)) setStage('over');
-        if(t % Math.max(18, 55 - (total - alive.length)*4) === 0 && alive.length){
+        if(t % Math.max(16, 50 - Math.floor((1 - alive.length/total) * 34)) === 0 && alive.length){
           const e = alive[Math.random()*alive.length|0]; bombs.push({x:e.x + ew/2, y:e.y + eh, vx:0, vy:4.5});
         }
         if(!alive.length){ setStage('warning'); chip([[220,.15],[196,.15],[220,.15],[196,.3]]); }
       }
-      g.font = '10px "JetBrains Mono", monospace'; g.textAlign = 'center';
-      alive.forEach(e => { sprite(g, INVADER[(t>>4)&1], e.x, e.y, P, C1); g.fillStyle = '#c9b8e8'; g.fillText(e.name, e.x + ew/2, e.y + eh + 14); });
-      g.textAlign = 'left';
+      alive.forEach(e => sprite(g, INVADER[(t>>4)&1], e.x, e.y, P, [C1, C3, C2, '#fff'][e.row]));
       // boss
       if(stage === 'warning'){
         if((st>>3)&1) banner('WARNING', 'THE BUG IS APPROACHING');
@@ -1053,7 +1053,7 @@ window.eggs = (() => {
       // stage banners
       if(stage === 'intro'){
         const n = 3 - Math.floor(st/50);
-        banner(n > 0 ? String(n) : 'FIGHT!', 'defeat the projects, then THE BUG');
+        banner(n > 0 ? String(n) : 'FIGHT!', 'defeat the invaders, then THE BUG');
         if(st % 50 === 1) chip([[n > 0 ? 440 : 880, .12]]);
         if(st > 200) setStage('wave');
       }
