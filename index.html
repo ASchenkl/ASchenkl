@@ -609,11 +609,31 @@ then type: <span class="g">unlock</span> &lt;fragment1+fragment2+fragment3&gt;`,
     f ? f(rest.join(' ')) : print(`command not found: ${esc(c)} – type <span class="g">help</span>`, 'err');
   };
   print('Welcome to aurel-OS v1.0 – type <span class="g">help</span> to get started.');
+  // Tab completion: commands, and project names after open/play/run. Secret commands stay secret.
+  const SECRET = new Set(['rm', 'sudo', 'exit', 'hint', 'unlock', 'ls', 'run']);
+  const complete = () => {
+    const v = inp.value, sp = v.indexOf(' ');
+    let pre, word, pool;
+    if(sp < 0){ pre = ''; word = v; pool = Object.keys(CMDS).filter(k => !SECRET.has(k)); }
+    else {
+      const c = v.slice(0, sp).toLowerCase();
+      if(!['open', 'play', 'run'].includes(c)) return;
+      pre = v.slice(0, sp+1); word = v.slice(sp+1).trimStart();
+      pool = PROJECTS.filter(p => c === 'open' || p.url).map(p => p.name);
+    }
+    const m = pool.filter(n => n.toLowerCase().startsWith(word.toLowerCase()));
+    if(!m.length) return;
+    if(m.length === 1){ inp.value = pre + m[0] + (sp < 0 ? ' ' : ''); return; }
+    let cp = m[0];
+    for(const n of m) while(!n.toLowerCase().startsWith(cp.toLowerCase())) cp = cp.slice(0, -1);
+    if(cp.length > word.length) inp.value = pre + cp;
+    else { print(`<span class="ps">aurel@github:~$</span> ${esc(v)}`); print(m.map(n => `<span class="g">${n}</span>`).join('   ')); }
+  };
   inp.addEventListener('keydown', e => {
     if(e.key==='Enter'){ const v = inp.value; if(v.trim()) hist.push(v); hi = hist.length; inp.value=''; run(v); }
     else if(e.key==='ArrowUp'){ if(hi>0) inp.value = hist[--hi]; e.preventDefault(); }
     else if(e.key==='ArrowDown'){ inp.value = hi<hist.length-1 ? hist[++hi] : (hi=hist.length,''); e.preventDefault(); }
-    else if(e.key==='Tab'){ e.preventDefault(); const m = Object.keys(CMDS).find(k=>k.startsWith(inp.value)); if(m) inp.value = m; }
+    else if(e.key==='Tab'){ e.preventDefault(); complete(); }
   });
   body.addEventListener('click', () => inp.focus({preventScroll:true}));
 })();
