@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aurel Schenkl</title>
-<meta name="description" content="Aurel Schenkl – developer & game creator. Projects, skills and contact.">
+<meta name="description" content="Aurel Schenkl – AI developer & game creator. Projects, skills and contact.">
 <meta name="theme-color" content="#050805">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23050805'/><text x='5' y='23' font-family='monospace' font-size='18' fill='%2339ff7a'>&gt;_</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -317,7 +317,7 @@ body.arcade .scroll-hint{font-family:'Press Start 2P',monospace;font-size:.5rem}
         <dl class="kv">
           <dt>name</dt><dd>Aurel Schenkl</dd>
           <dt>handle</dt><dd>@ASchenkl</dd>
-          <dt>role</dt><dd>Developer &amp; Game Creator</dd>
+          <dt>role</dt><dd>AI Developer &amp; Game Creator</dd>
           <dt>status</dt><dd style="color:var(--green)">● online – building stuff</dd>
         </dl>
       </div>
@@ -325,7 +325,7 @@ body.arcade .scroll-hint{font-family:'Press Start 2P',monospace;font-size:.5rem}
     <div class="window reveal">
       <div class="bar"><i class="dot" style="background:#ff5f57"></i><i class="dot" style="background:#febc2e"></i><i class="dot" style="background:#28c840"></i><span class="title">about.txt</span></div>
       <div class="body about-text">
-        <p>Hi, I'm <span class="hl">Aurel</span> 👋 – a developer who loves turning ideas into <span class="hl">playable games</span> and useful tools.</p>
+        <p>Hi, I'm <span class="hl">Aurel</span> 👋 – an AI developer who loves turning ideas into <span class="hl">playable games</span> and useful tools.</p>
         <p>Most of my projects are games: from pixel-art shooters, space battles and brawlers to farming and strategy board games like Quoridor and Battleship with an <span class="hl">AI opponent</span>.</p>
         <p>I work with <span class="hl">Python</span>, <span class="hl">JavaScript</span> and <span class="hl">TypeScript</span> and I like experimenting with AI-assisted development.</p>
         <p>Currently: building new games and learning something new every day.</p>
@@ -452,7 +452,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   document.getElementById('name').classList.add('on');
   await sleep(350);
   document.getElementById('cta').classList.add('on');
-  const roles = ['Developer.', 'Game Creator.', 'Python · JavaScript · TypeScript', 'Always building something new.'];
+  const roles = ['AI Developer.', 'Game Creator.', 'Python · JavaScript · TypeScript', 'Always building something new.'];
   const el = document.getElementById('role');
   for(let i=0;;i=(i+1)%roles.length){
     const r = roles[i];
@@ -555,7 +555,7 @@ document.getElementById('yr').textContent = new Date().getFullYear();
   <span class="g">hint</span>         tips for the secret hunt
   <span class="g">unlock</span> &lt;code&gt; unlock the secret
 <span class="a">…and a few secret ones. good luck.</span>`),
-    whoami: () => print('Aurel Schenkl – developer &amp; game creator. Python, JavaScript, TypeScript.'),
+    whoami: () => print('Aurel Schenkl – AI developer &amp; game creator. Python, JavaScript, TypeScript.'),
     projects: () => print(PROJECTS.map(p => `<span class="a">${p.icon}</span> <a class="g" href="${GH+p.name}" target="_blank" rel="noopener">${p.name.padEnd(22)}</a> ${p.lang.padEnd(11)}${p.url ? ` <a class="ps" href="${p.url}" target="_blank" rel="noopener">▶ live</a>` : ''}`).join('\n')),
     play: a => {
       const live = PROJECTS.filter(p => p.url);
