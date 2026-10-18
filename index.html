@@ -552,6 +552,8 @@ document.getElementById('yr').textContent = new Date().getFullYear();
   <span class="g">cowsay</span> &lt;txt&gt; let the cow talk
   <span class="g">date</span>         current date
   <span class="g">clear</span>        clear the screen
+  <span class="g">hint</span>         tips for the secret hunt
+  <span class="g">unlock</span> &lt;code&gt; unlock the secret
 <span class="a">…and a few secret ones. good luck.</span>`),
     whoami: () => print('Aurel Schenkl – developer &amp; game creator. Python, JavaScript, TypeScript.'),
     projects: () => print(PROJECTS.map(p => `<span class="a">${p.icon}</span> <a class="g" href="${GH+p.name}" target="_blank" rel="noopener">${p.name.padEnd(22)}</a> ${p.lang.padEnd(11)}${p.url ? ` <a class="ps" href="${p.url}" target="_blank" rel="noopener">▶ live</a>` : ''}`).join('\n')),
@@ -698,7 +700,7 @@ then type: <span class="g">unlock</span> &lt;fragment1+fragment2+fragment3&gt;`,
   };
   print('Welcome to aurel-OS v1.0 – type <span class="g">help</span> to get started.');
   // Tab completion: commands, and project names after open/play/run. Secret commands stay secret.
-  const SECRET = new Set(['rm', 'sudo', 'exit', 'hint', 'unlock', 'ls', 'run']);
+  const SECRET = new Set(['rm', 'sudo', 'exit', 'ls', 'run']);
   const complete = () => {
     const v = inp.value, sp = v.indexOf(' ');
     let pre, word, pool;
