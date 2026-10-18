@@ -1018,7 +1018,7 @@ window.eggs = (() => {
       // player shots
       g.fillStyle = C3;
       shots = shots.filter(b => {
-        b.y -= 11; g.fillRect(b.x-1.5, b.y, 3, 12);
+        b.y -= 18; g.fillRect(b.x-1.5, b.y, 3, 16);
         if(b.y < -12) return false;
         const e = alive.find(e => b.x > e.x && b.x < e.x+ew && b.y > e.y && b.y < e.y+eh);
         if(e){ e.alive = false; score += 100; boom(e.x+ew/2, e.y+eh/2, C1); chip([[180,.08],[90,.12]]); return false; }
