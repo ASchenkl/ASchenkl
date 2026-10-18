@@ -9,7 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23050805'/><text x='5' y='23' font-family='monospace' font-size='18' fill='%2339ff7a'>&gt;_</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#050805; --bg2:#0a120b; --panel:rgba(10,22,12,.72);
@@ -180,9 +180,84 @@ footer .g{color:var(--green)}
 #ship{position:fixed;inset:0;width:100%;height:100%;z-index:90;pointer-events:none}
 .glitch.hard::before{animation-duration:.4s}
 .glitch.hard::after{animation-duration:.3s}
-body.arcade{--bg:#0b0414;--bg2:#14061e;--panel:rgba(30,8,40,.75);--fg:#ffe0fa;--dim:#a070a8;--green:#ff3df0;--cyan:#ffe23d;--amber:#3df0ff;
-  --border:rgba(255,61,240,.3);--glow:0 0 8px rgba(255,61,240,.6),0 0 24px rgba(255,61,240,.3);font-family:'VT323',monospace;font-size:1.2rem}
-body.arcade #term input{font-family:'VT323',monospace}
+/* ===== Arcade mode (Konami code): CGA neon palette, pixel font, CRT, synthwave ===== */
+body.arcade{--bg:#0d0221;--bg2:#1a0638;--panel:rgba(26,8,52,.88);--fg:#f5e9ff;--dim:#a68bd0;--green:#ff2a6d;--cyan:#05d9e8;--amber:#f9f871;
+  --border:#ff2a6d;--glow:0 0 6px #ff2a6d,0 0 18px rgba(255,42,109,.6);font-family:'VT323',monospace;font-size:1.3rem;
+  cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' shape-rendering='crispEdges'%3E%3Cpath fill='%2305d9e8' d='M14 0h4v10h-4zM14 22h4v10h-4zM0 14h10v4H0zM22 14h10v4H22z'/%3E%3Cpath fill='%23ff2a6d' d='M14 14h4v4h-4z'/%3E%3C/svg%3E") 16 16, crosshair}
+body.arcade a, body.arcade button, body.arcade .card{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' shape-rendering='crispEdges'%3E%3Cpath fill='%2305d9e8' d='M14 0h4v10h-4zM14 22h4v10h-4zM0 14h10v4H0zM22 14h10v4H22z'/%3E%3Cpath fill='%23ff2a6d' d='M14 14h4v4h-4z'/%3E%3C/svg%3E") 16 16, crosshair}
+body.arcade *{border-radius:0!important}
+body.arcade #term input{font-family:'VT323',monospace;font-size:1.3rem}
+body.arcade .logo, body.arcade nav ul, body.arcade .btn, body.arcade .filters button, body.arcade .tag, body.arcade .stat b,
+body.arcade .sec-title, body.arcade .card h3, body.arcade .name, body.arcade .toast, body.arcade .bar .title, body.arcade .open{font-family:'Press Start 2P',monospace;letter-spacing:0}
+body.arcade nav ul{font-size:.55rem}
+body.arcade .logo{font-size:.75rem}
+body.arcade .btn{font-size:.65rem;padding:14px 18px;box-shadow:4px 4px 0 var(--cyan);border-width:3px}
+body.arcade .btn:active{transform:translate(4px,4px);box-shadow:none}
+body.arcade .filters button{font-size:.55rem;padding:9px 12px;border:2px solid var(--border)}
+body.arcade .tag{font-size:.5rem;padding:5px 7px}
+body.arcade .stat b{font-size:1.3rem;margin-bottom:8px}
+body.arcade .sec-title{font-size:clamp(.8rem,2.4vw,1.25rem);line-height:1.6}
+body.arcade .card h3{font-size:.75rem;line-height:1.5}
+body.arcade .bar .title, body.arcade .open, body.arcade .toast{font-size:.55rem}
+body.arcade .name{font-size:clamp(1.5rem,6.4vw,4.4rem);line-height:1.25;color:#fff}
+body.arcade .name{text-shadow:3px 0 #05d9e8,-3px 0 #ff2a6d,0 0 18px rgba(255,42,109,.7)}
+body.arcade .sec-title, body.arcade .card h3, body.arcade .stat b{color:#fff;text-shadow:2px 0 rgba(5,217,232,.8),-2px 0 rgba(255,42,109,.8)}
+body.arcade .sec-title .cmd{color:#fff}
+body.arcade .sec-title .cmd::before{color:var(--amber)}
+body.arcade .window, body.arcade .card, body.arcade .stat, body.arcade .contact a{border:3px solid var(--border);box-shadow:6px 6px 0 var(--cyan)}
+body.arcade .card:hover{box-shadow:10px 10px 0 var(--amber)}
+body.arcade .bar{background:var(--border);color:var(--bg);border-bottom:0}
+body.arcade .bar .dot{border-radius:0;background:var(--bg)!important}
+body.arcade .about-text p, body.arcade .card p{color:#d9c8f0}
+body.arcade .avatar-wrap img{filter:grayscale(1) contrast(1.4);image-rendering:pixelated}
+body.arcade .avatar-wrap::after{background:linear-gradient(#ff2a6d,#05d9e8);mix-blend-mode:color}
+body.arcade .caret{background:var(--amber)}
+body.arcade #glow{background:radial-gradient(circle,rgba(5,217,232,.08),transparent 65%)}
+/* stronger CRT: thick scanlines + RGB phosphor mask + flicker */
+body.arcade::before{background:
+  repeating-linear-gradient(to bottom,rgba(0,0,0,.38) 0 2px,transparent 2px 4px),
+  repeating-linear-gradient(90deg,rgba(255,0,60,.06) 0 1px,rgba(0,255,120,.04) 1px 2px,rgba(0,90,255,.06) 2px 3px);
+  mix-blend-mode:normal;animation:crt-flicker .12s infinite}
+@keyframes crt-flicker{0%{opacity:.92}50%{opacity:1}100%{opacity:.95}}
+body.arcade::after{background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.55) 85%,rgba(0,0,0,.95) 100%);box-shadow:inset 0 0 120px rgba(0,0,0,.9)}
+#crt-roll{display:none}
+body.arcade #crt-roll{display:block;position:fixed;left:0;right:0;top:0;height:140px;z-index:102;pointer-events:none;
+  background:linear-gradient(transparent,rgba(255,255,255,.06) 50%,transparent);animation:roll 7s linear infinite}
+@keyframes roll{from{transform:translateY(-140px)}to{transform:translateY(100vh)}}
+/* synthwave hero: striped sun + moving TRON grid */
+.synth{display:none}
+body.arcade #matrix{display:none}
+body.arcade .synth{display:block;position:absolute;inset:0;overflow:hidden;background:linear-gradient(#0d0221 0%,#2b0b5a 55%,#7a1172 64%,#0d0221 64.2%)}
+.sun{position:absolute;left:50%;top:64%;width:min(52vw,440px);aspect-ratio:1;transform:translate(-50%,-100%) translateY(50%);border-radius:50%!important;
+  background:linear-gradient(#f9f871 10%,#ff9a3c 40%,#ff2a6d 70%,#b3008a);filter:drop-shadow(0 0 40px rgba(255,42,109,.8));
+  -webkit-mask:linear-gradient(#000 0 26%,transparent 26%),repeating-linear-gradient(#000 0 4.5%,transparent 4.5% 6.5%);
+          mask:linear-gradient(#000 0 26%,transparent 26%),repeating-linear-gradient(#000 0 4.5%,transparent 4.5% 6.5%)}
+body.arcade .sun{border-radius:50%!important}
+.floor{position:absolute;left:0;right:0;top:64%;bottom:0;overflow:hidden;background:linear-gradient(#0d0221,#1a0638)}
+.floor::before{content:"";position:absolute;left:-60%;right:-60%;top:0;height:260%;transform-origin:50% 0;transform:perspective(260px) rotateX(62deg);
+  background-image:linear-gradient(#ff2a6d 2px,transparent 2px),linear-gradient(90deg,#ff2a6d 2px,transparent 2px);background-size:60px 60px;
+  animation:grid-move .5s linear infinite;filter:drop-shadow(0 0 4px #ff2a6d)}
+.floor::after{content:"";position:absolute;inset:0;background:linear-gradient(#0d0221 0%,transparent 30%)}
+@keyframes grid-move{to{background-position:0 60px}}
+.horizon{position:absolute;left:0;right:0;top:64%;height:3px;background:#ff2a6d;box-shadow:0 0 20px 6px rgba(255,42,109,.7)}
+body.arcade #hero::after{background:linear-gradient(rgba(13,2,33,.15),rgba(13,2,33,.25))}
+body.arcade .boot{display:none}
+/* HUD + insert coin */
+#hud,.coin{display:none}
+body.arcade #hud{display:flex;justify-content:center;gap:clamp(14px,5vw,60px);position:fixed;top:56px;left:0;right:0;z-index:49;padding:8px 16px;
+  font-family:'Press Start 2P',monospace;font-size:clamp(.45rem,1.4vw,.6rem);color:var(--fg);background:rgba(13,2,33,.75);text-shadow:2px 0 #05d9e8,-2px 0 #ff2a6d}
+#hud b{color:var(--amber);font-weight:400}
+#hud .up{color:var(--green);animation:blink 1s steps(1) infinite}
+body.arcade .coin{display:block;margin-top:30px;font-family:'Press Start 2P',monospace;font-size:clamp(.6rem,2vw,.9rem);color:var(--amber);
+  text-shadow:0 0 10px var(--amber);animation:blink 1.1s steps(1) infinite}
+body.arcade .scroll-hint{font-family:'Press Start 2P',monospace;font-size:.5rem}
+/* CRT power on / off */
+#crt-power{position:fixed;inset:0;z-index:140;pointer-events:none;background:#000}
+#crt-power::after{content:"";position:absolute;left:0;right:0;top:50%;height:4px;background:#fff;box-shadow:0 0 30px 10px #fff;transform:translateY(-50%) scaleX(0)}
+#crt-power.on{animation:pw-bg .9s forwards}
+#crt-power.on::after{animation:pw-on .9s forwards}
+@keyframes pw-on{0%{transform:translateY(-50%) scaleX(0)}35%{transform:translateY(-50%) scaleX(1);height:4px;opacity:1}100%{transform:translateY(-50%) scaleX(1);height:100%;opacity:0}}
+@keyframes pw-bg{0%,40%{opacity:1}100%{opacity:0}}
 
 #matrix-full{position:fixed;inset:0;z-index:115;background:#000;opacity:0;transition:opacity .8s;cursor:pointer}
 #matrix-full.on{opacity:1}
@@ -201,6 +276,8 @@ body.arcade #term input{font-family:'VT323',monospace}
 </head>
 <body>
 <div id="glow"></div>
+<div id="crt-roll"></div>
+<div id="hud"><span><span class="up">1UP</span> <b id="score">000000</b></span><span>HI-SCORE <b id="hiscore">013370</b></span><span>CREDIT <b id="credit">01</b></span></div>
 
 <nav id="nav">
   <a href="#hero" class="logo">&gt; aurel<span>_</span></a>
@@ -215,6 +292,7 @@ body.arcade #term input{font-family:'VT323',monospace}
 
 <header id="hero">
   <canvas id="matrix"></canvas>
+  <div class="synth" aria-hidden="true"><div class="sun"></div><div class="horizon"></div><div class="floor"></div></div>
   <div class="hero-inner">
     <div class="boot" id="boot"></div>
     <h1 class="name glitch" id="name" data-text="AUREL SCHENKL">AUREL SCHENKL</h1>
@@ -223,6 +301,7 @@ body.arcade #term input{font-family:'VT323',monospace}
       <a class="btn" href="#projects">./view_projects</a>
       <a class="btn alt" href="#term">./open_terminal</a>
     </div>
+    <div class="coin">INSERT COIN</div>
   </div>
   <a href="#about" class="scroll-hint">▼ scroll ▼</a>
 </header>
@@ -679,6 +758,35 @@ window.eggs = (() => {
     melting = false;
   };
 
+  // 8-bit square-wave sound: notes = [[frequency, seconds], ...]
+  let actx;
+  const chip = notes => {
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      let t = actx.currentTime;
+      for(const [f, d] of notes){
+        const o = actx.createOscillator(), g = actx.createGain();
+        o.type = 'square'; o.frequency.value = f;
+        g.gain.setValueAtTime(.06, t); g.gain.exponentialRampToValueAtTime(.001, t + d);
+        o.connect(g).connect(actx.destination); o.start(t); o.stop(t + d); t += d * .6;
+      }
+    } catch {}
+  };
+  // arcade HUD: score grows with scrolling and clicks
+  let score = 0;
+  const pad = n => String(n).padStart(6, '0');
+  const addScore = n => {
+    if(!document.body.classList.contains('arcade')) return;
+    score += n; document.getElementById('score').textContent = pad(score);
+    if(score > 13370) document.getElementById('hiscore').textContent = pad(score);
+  };
+  let lastY = scrollY;
+  addEventListener('scroll', () => { if(scrollY > lastY) addScore(Math.round((scrollY - lastY)/5)); lastY = scrollY; }, {passive:true});
+  addEventListener('click', e => {
+    if(!document.body.classList.contains('arcade')) return;
+    if(e.target.closest('a, button, .card')){ addScore(100); chip([[1568,.05],[2093,.08]]); }
+  });
+
   // Konami code → arcade mode (fragment 2)
   const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
   let kp = 0;
@@ -687,8 +795,13 @@ window.eggs = (() => {
     kp = k === KONAMI[kp] ? kp+1 : (k === KONAMI[0] ? 1 : 0);
     if(kp < KONAMI.length) return;
     kp = 0;
-    const on = document.body.classList.toggle('arcade');
-    window.MCOL = on ? ['#ff3df0', '#8a1f9e'] : ['#39ff7a', '#1f9e48'];
+    const on = !document.body.classList.contains('arcade');
+    const pw = document.createElement('div'); pw.id = 'crt-power'; document.body.appendChild(pw);
+    requestAnimationFrame(() => {
+      document.body.classList.toggle('arcade', on);
+      pw.classList.add('on'); setTimeout(() => pw.remove(), 1000);
+    });
+    chip(on ? [[988,.08],[1319,.4]] : [[660,.1],[440,.1],[220,.3]]);
     toast(on ? 'ARCADE MODE: ON<br><small>fragment 2/3: <b>TCH</b></small>' : 'ARCADE MODE: OFF');
   });
 
