@@ -493,7 +493,7 @@ document.getElementById('yr').textContent = new Date().getFullYear();
     sudo: () => print('nice try. this incident will be reported. 🚨', 'err'),
     echo: a => print(esc(a||'')),
     exit: () => print('there is no escape.'),
-    rm: a => /-\w*(rf|fr)/.test(a||'') ? (print('deleting everything...', 'err'), window.eggs.meltdown()) : print(`rm: cannot remove '${esc(a||'')}': Permission denied`, 'err'),
+    rm: () => { print('deleting everything...', 'err'); window.eggs.meltdown(); },
     joke: () => print(JOKES[Math.random()*JOKES.length|0], 'a'),
     coffee: async () => {
       busy(true); print('brewing coffee...');
@@ -644,8 +644,8 @@ window.eggs = (() => {
     const b = document.createElement('div'); b.id = 'bsod';
     b.innerHTML = '<div class="face">:(</div><p>Your homepage ran into a problem and needs to restart.</p><p><span id="pct">0</span>% complete</p><small>Stop code: USER_TYPED_RM_RF<br>(relax, nothing was actually deleted)</small>';
     document.body.appendChild(b);
-    for(let p=0;p<=100;p+=Math.ceil(Math.random()*9)){ b.querySelector('#pct').textContent = p; await sleep(70); }
-    b.querySelector('#pct').textContent = 100; await sleep(500);
+    for(let p=0;p<100;p=Math.min(100,p+Math.ceil(Math.random()*4))){ b.querySelector('#pct').textContent = p; await sleep(Math.random() < .08 ? 900 : 140); }
+    b.querySelector('#pct').textContent = 100; await sleep(1500);
     els.forEach(el => el.classList.remove('fall'));
     b.remove(); scrollTo({top:0, behavior:'instant'});
     toast('system restored. please don\'t do that again.');
