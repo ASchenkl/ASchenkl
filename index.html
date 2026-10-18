@@ -1000,7 +1000,7 @@ window.eggs = (() => {
       // boss
       if(stage === 'warning'){
         if((st>>3)&1) banner('WARNING', 'THE BUG IS APPROACHING');
-        if(st > 140){ boss = {x:W/2 - bw/2, y:-bh, hp:30, max:30}; setStage('boss'); }
+        if(st > 140){ boss = {x:W/2 - bw/2, y:-bh, hp:20, max:20}; setStage('boss'); }
       }
       if(boss && stage === 'boss'){
         boss.x = W/2 - bw/2 + Math.sin(t/55) * (W/2 - bw/2 - 20);
