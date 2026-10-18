@@ -184,6 +184,15 @@ body.arcade{--bg:#0b0414;--bg2:#14061e;--panel:rgba(30,8,40,.75);--fg:#ffe0fa;--
   --border:rgba(255,61,240,.3);--glow:0 0 8px rgba(255,61,240,.6),0 0 24px rgba(255,61,240,.3);font-family:'VT323',monospace;font-size:1.2rem}
 body.arcade #term input{font-family:'VT323',monospace}
 
+#matrix-full{position:fixed;inset:0;z-index:115;background:#000;opacity:0;transition:opacity .8s;cursor:pointer}
+#matrix-full.on{opacity:1}
+#matrix-full canvas{position:absolute;inset:0;width:100%;height:100%}
+.mx-text{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:'VT323',monospace;font-size:clamp(2rem,7vw,4.5rem);
+  color:#c9ffd6;text-shadow:0 0 14px #00ff41,0 0 30px #00ff41;background:rgba(0,0,0,.8);padding:6px 26px;white-space:nowrap}
+.mx-text:empty{display:none}
+.mx-text::after{content:"█";margin-left:4px;animation:blink 1s steps(1) infinite}
+.mx-skip{position:absolute;bottom:18px;left:0;right:0;text-align:center;font-size:.75rem;color:#2f8f4a}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
   .reveal{opacity:1;transform:none}
@@ -485,7 +494,7 @@ document.getElementById('yr').textContent = new Date().getFullYear();
       if(!p) return print(`open: project not found: ${esc(a)}`, 'err');
       print(`opening ${p.name} ...`); open(GH+p.name,'_blank');
     },
-    matrix: () => { print('wake up, neo...', 'g'); window.matrixBoost(); },
+    matrix: () => { print('wake up, neo...', 'g'); window.eggs.matrixMode(); },
     date: () => print(new Date().toString()),
     clear: () => out.innerHTML = '',
     sudo: () => print('nice try. this incident will be reported. 🚨', 'err'),
@@ -740,7 +749,50 @@ window.eggs = (() => {
   console.log('%cHey, curious developer! You found the first secret.\n\nfragment 1/3: GL1\n\nThere are 3 fragments hidden on this page. Combine them and type "unlock <code>" in the terminal.',
     'color:#39ff7a;font-family:monospace;font-size:13px');
 
-  return {toast, bigMsg, meltdown};
+  // matrix → full-screen digital rain with the classic messages
+  let inMatrix = false;
+  const matrixMode = async () => {
+    if(inMatrix) return; inMatrix = true;
+    const wrap = document.createElement('div'); wrap.id = 'matrix-full';
+    wrap.innerHTML = '<canvas></canvas><div class="mx-text"></div><div class="mx-skip">click or press ESC to exit</div>';
+    document.body.appendChild(wrap);
+    const cv = wrap.querySelector('canvas'), txt = wrap.querySelector('.mx-text'), x = cv.getContext('2d');
+    cv.width = innerWidth; cv.height = innerHeight;
+    const fs = 18, chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ0123456789Z:・."=*+-<>¦|';
+    const drops = Array.from({length:Math.ceil(cv.width/fs)}, () => Math.random()*-40);
+    const ch = () => chars[Math.random()*chars.length|0];
+    let done = false, skip = false;
+    const draw = () => {
+      x.fillStyle = 'rgba(0,0,0,.07)'; x.fillRect(0,0,cv.width,cv.height);
+      x.font = fs + 'px monospace';
+      drops.forEach((d,i) => {
+        const y = d*fs;
+        x.fillStyle = '#00ff41'; x.fillText(ch(), i*fs, y-fs);
+        x.fillStyle = '#eaffef'; x.fillText(ch(), i*fs, y);
+        if(y > cv.height && Math.random() > .96) drops[i] = 0;
+        drops[i] += .8;
+      });
+      if(!done) requestAnimationFrame(draw);
+    };
+    const onKey = e => { if(e.key === 'Escape') skip = true; };
+    wrap.addEventListener('click', () => skip = true);
+    addEventListener('keydown', onKey);
+    const wait = async ms => { for(let t=0; t<ms && !skip; t+=50) await sleep(50); };
+    requestAnimationFrame(() => wrap.classList.add('on'));
+    draw();
+    await wait(1500);
+    for(const line of ['Wake up, Neo...', 'The Matrix has you...', 'Follow the white rabbit.', 'Knock, knock.']){
+      txt.textContent = '';
+      for(const c of line){ if(skip) break; txt.textContent += c; await sleep(85); }
+      await wait(1700);
+    }
+    txt.textContent = '';
+    await wait(1200);
+    wrap.classList.remove('on'); await sleep(800);
+    done = true; wrap.remove(); removeEventListener('keydown', onKey); inMatrix = false;
+  };
+
+  return {toast, bigMsg, meltdown, matrixMode};
 })();
 </script>
 </body>
