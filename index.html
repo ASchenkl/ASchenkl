@@ -159,6 +159,28 @@ footer .g{color:var(--green)}
   background:radial-gradient(circle,rgba(57,255,122,.07),transparent 65%);transform:translate(-50%,-50%);left:-400px;top:-400px}
 @media (hover:none){#glow{display:none}}
 
+/* Easter eggs */
+.egg-hint{margin-top:8px;font-size:.7rem;opacity:.45}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);z-index:120;background:var(--bg);border:1px solid var(--green);
+  color:var(--green);padding:12px 20px;font-size:.85rem;box-shadow:var(--glow);opacity:0;transition:all .4s;max-width:calc(100% - 32px);text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.big-msg{position:fixed;inset:0;z-index:110;display:grid;place-items:center;pointer-events:none;background:rgba(5,8,5,.75);
+  font-family:'VT323',monospace;font-size:clamp(2.6rem,11vw,7rem);color:var(--green);text-shadow:var(--glow);text-align:center;padding:16px;animation:flicker .12s steps(2) 8}
+@keyframes flicker{50%{opacity:.3}}
+.fall{transition:transform 1.4s cubic-bezier(.5,0,.9,.5) var(--dl,0s),opacity 1.4s var(--dl,0s)!important;transform:translateY(110vh) rotate(var(--r,0deg))!important;opacity:0!important}
+#bsod{position:fixed;inset:0;z-index:130;background:#0078d7;color:#fff;font-family:'Segoe UI',system-ui,sans-serif;padding:clamp(24px,10vw,120px);font-size:clamp(1rem,2.4vw,1.5rem);line-height:1.5}
+#bsod .face{font-size:clamp(4rem,12vw,8rem);line-height:1;margin-bottom:24px}
+#bsod small{display:block;margin-top:28px;font-size:.8em;opacity:.85}
+.hit{animation:hit .4s}
+@keyframes hit{0%,100%{transform:none}20%{transform:translate(-5px,2px)}40%{transform:translate(5px,-2px)}60%{transform:translate(-3px,1px)}80%{transform:translate(3px,0)}}
+.hit{border-color:var(--red)!important;box-shadow:0 0 30px rgba(255,77,109,.5)!important}
+#ship{position:fixed;inset:0;width:100%;height:100%;z-index:90;pointer-events:none}
+.glitch.hard::before{animation-duration:.4s}
+.glitch.hard::after{animation-duration:.3s}
+body.arcade{--bg:#0b0414;--bg2:#14061e;--panel:rgba(30,8,40,.75);--fg:#ffe0fa;--dim:#a070a8;--green:#ff3df0;--cyan:#ffe23d;--amber:#3df0ff;
+  --border:rgba(255,61,240,.3);--glow:0 0 8px rgba(255,61,240,.6),0 0 24px rgba(255,61,240,.3);font-family:'VT323',monospace;font-size:1.2rem}
+body.arcade #term input{font-family:'VT323',monospace}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
   .reveal{opacity:1;transform:none}
@@ -280,6 +302,7 @@ footer .g{color:var(--green)}
 
 <footer>
   <p><span class="g">$</span> echo "© <span id="yr"></span> Aurel Schenkl – built with HTML, CSS &amp; JS"</p>
+  <p class="egg-hint">3 fragments are hidden on this page. find them all_</p>
 </footer>
 
 <script>
@@ -299,6 +322,7 @@ const PROJECTS = [
 ];
 
 /* ---------- Matrix rain ---------- */
+window.MCOL = ['#39ff7a', '#1f9e48'];
 (() => {
   const c = document.getElementById('matrix'), x = c.getContext('2d');
   const chars = 'アカサタナハマヤラワ01234567890ABCDEF<>/{}[]$#*+=';
@@ -311,7 +335,7 @@ const PROJECTS = [
     x.font = fs+'px JetBrains Mono, monospace';
     for(let i=0;i<cols;i++){
       const t = chars[Math.random()*chars.length|0], y = drops[i]*fs;
-      x.fillStyle = Math.random()>.975 ? '#eaffef' : (Math.random()>.5?'#39ff7a':'#1f9e48');
+      x.fillStyle = Math.random()>.975 ? '#eaffef' : window.MCOL[Math.random()>.5?0:1];
       x.fillText(t, i*fs, y);
       if(y > h && Math.random() > .975) drops[i] = 0;
       drops[i] += .55;
@@ -426,8 +450,14 @@ document.getElementById('yr').textContent = new Date().getFullYear();
   <span class="g">skills</span>       show skills
   <span class="g">github</span>       open my GitHub profile
   <span class="g">matrix</span>       enter the matrix
+  <span class="g">snake</span>        play snake
+  <span class="g">hack</span>         hack the mainframe
+  <span class="g">joke</span>         tell a programmer joke
+  <span class="g">coffee</span>       brew some coffee
+  <span class="g">cowsay</span> &lt;txt&gt; let the cow talk
   <span class="g">date</span>         current date
-  <span class="g">clear</span>        clear the screen`),
+  <span class="g">clear</span>        clear the screen
+<span class="a">…and a few secret ones. good luck.</span>`),
     whoami: () => print('Aurel Schenkl – developer &amp; game creator. Python, JavaScript, TypeScript.'),
     projects: () => print(PROJECTS.map(p => `<span class="a">${p.icon}</span> <a class="g" href="${GH+p.name}" target="_blank" rel="noopener">${p.name.padEnd(22)}</a> ${p.lang}`).join('\n')),
     ls: () => CMDS.projects(),
@@ -445,7 +475,117 @@ document.getElementById('yr').textContent = new Date().getFullYear();
     sudo: () => print('nice try. this incident will be reported. 🚨', 'err'),
     echo: a => print(esc(a||'')),
     exit: () => print('there is no escape.'),
+    rm: a => /-\w*(rf|fr)/.test(a||'') ? (print('deleting everything...', 'err'), window.eggs.meltdown()) : print(`rm: cannot remove '${esc(a||'')}': Permission denied`, 'err'),
+    joke: () => print(JOKES[Math.random()*JOKES.length|0], 'a'),
+    coffee: async () => {
+      busy(true); print('brewing coffee...');
+      await sleep(900);
+      print(`      ( (
+       ) )
+    .........
+    |       |]
+    \\       /
+     \`-----'`, 'a');
+      print('here you go. java, freshly brewed.'); busy(false);
+    },
+    cowsay: a => {
+      const t = a || 'moo. type help';
+      print(esc(` ${'_'.repeat(t.length+2)}
+< ${t} >
+ ${'-'.repeat(t.length+2)}
+        \\   ^__^
+         \\  (oo)\\_______
+            (__)\\       )\\/\\
+                ||----w |
+                ||     ||`));
+    },
+    hack: async () => {
+      busy(true);
+      const hex = () => Array.from({length:8}, () => (Math.random()*65536|0).toString(16).padStart(4,'0')).join(' ');
+      for(const st of ['bypassing firewall', 'injecting payload', 'decrypting mainframe', 'escalating privileges']){
+        print(`&gt; ${st}...`, 'a');
+        for(let i=0;i<4;i++){ print(hex(), 'g'); await sleep(60); }
+        const bar = document.createElement('div'); bar.className = 'line'; out.appendChild(bar);
+        for(let p=0;p<=20;p++){ bar.textContent = `[${'#'.repeat(p)}${'.'.repeat(20-p)}] ${p*5}%`; body.scrollTop = body.scrollHeight; await sleep(25); }
+      }
+      window.eggs.bigMsg('ACCESS GRANTED');
+      print('just kidding. no systems were harmed.');
+      busy(false);
+    },
+    snake: () => {
+      busy(true);
+      const C = 14, W = 22, H = 15;
+      const cv = document.createElement('canvas'); cv.width = W*C; cv.height = H*C;
+      cv.style.cssText = 'display:block;margin:8px 0;border:1px solid var(--green);max-width:100%;touch-action:none';
+      const info = document.createElement('div'); info.className = 'line';
+      out.append(info, cv); body.scrollTop = body.scrollHeight;
+      const g = cv.getContext('2d'), col = getComputedStyle(document.body).getPropertyValue('--green').trim();
+      let s = [{x:5,y:7},{x:4,y:7},{x:3,y:7}], d = {x:1,y:0}, nd = d, food, score = 0, hs = +(store('snake-hs')||0), over = false;
+      const place = () => { do food = {x:Math.random()*W|0, y:Math.random()*H|0}; while(s.some(p => p.x===food.x && p.y===food.y)); };
+      const turn = ([x,y]) => { if(x!==-d.x || y!==-d.y) nd = {x,y}; };
+      const dirs = {ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],s:[0,1],a:[-1,0],d:[1,0]};
+      const key = e => { if(e.key==='Escape' || e.key==='q') return end(false); const k = dirs[e.key]; if(k){ e.preventDefault(); turn(k); } };
+      let tx, ty;
+      cv.addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, {passive:true});
+      cv.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX-tx, dy = e.changedTouches[0].clientY-ty;
+        Math.abs(dx) > Math.abs(dy) ? turn([Math.sign(dx),0]) : turn([0,Math.sign(dy)]);
+      });
+      const draw = () => {
+        g.fillStyle = '#020402'; g.fillRect(0,0,cv.width,cv.height);
+        g.fillStyle = '#ff4d6d'; g.fillRect(food.x*C+3, food.y*C+3, C-6, C-6);
+        g.fillStyle = col; s.forEach((p,i) => { g.globalAlpha = i ? .7 : 1; g.fillRect(p.x*C+1, p.y*C+1, C-2, C-2); }); g.globalAlpha = 1;
+        info.innerHTML = `SNAKE  score: <span class="g">${score}</span>  highscore: <span class="a">${hs}</span>  [arrows/WASD or swipe · ESC quits]`;
+      };
+      const tick = () => {
+        d = nd; const h = {x:s[0].x+d.x, y:s[0].y+d.y};
+        if(h.x<0 || h.y<0 || h.x>=W || h.y>=H || s.some(p => p.x===h.x && p.y===h.y)) return end(true);
+        s.unshift(h);
+        if(h.x===food.x && h.y===food.y){ score++; place(); } else s.pop();
+        draw();
+      };
+      function end(dead){
+        if(over) return; over = true;
+        clearInterval(iv); removeEventListener('keydown', key);
+        if(score > hs){ hs = score; store('snake-hs', hs); print(`new highscore: ${hs}!`, 'g'); }
+        print(`${dead ? 'game over' : 'quit'}. score: ${score}`);
+        busy(false);
+      }
+      place(); draw();
+      addEventListener('keydown', key);
+      const iv = setInterval(tick, 110);
+    },
+    hint: () => print(`fragment 1: real developers look behind the scenes. (F12)
+fragment 2: up, up, down, down... you know the rest.
+fragment 3: the logo doesn't like being clicked. a lot.
+then type: <span class="g">unlock</span> &lt;fragment1+fragment2+fragment3&gt;`, 'a'),
+    unlock: a => {
+      if((a||'').toUpperCase() !== 'GL1TCH3D') return print('access denied. wrong code. (stuck? type <span class="g">hint</span>)', 'err');
+      print(`
+  ███████╗███████╗ ██████╗██████╗ ███████╗████████╗
+  ██╔════╝██╔════╝██╔════╝██╔══██╗██╔════╝╚══██╔══╝
+  ███████╗█████╗  ██║     ██████╔╝█████╗     ██║
+  ╚════██║██╔══╝  ██║     ██╔══██╗██╔══╝     ██║
+  ███████║███████╗╚██████╗██║  ██║███████╗   ██║
+  ╚══════╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚══════╝   ╚═╝`, 'g');
+      print('congratulations, you found all 3 fragments. you are a true hacker.\nonly very few visitors ever see this message.', 'a');
+      window.eggs.bigMsg('SECRET UNLOCKED');
+      document.getElementById('name').classList.add('hard');
+      window.matrixBoost();
+    },
   };
+  const JOKES = [
+    'why do programmers prefer dark mode? because light attracts bugs.',
+    'there are 10 types of people: those who understand binary and those who don\'t.',
+    'a SQL query walks into a bar, walks up to two tables and asks: "can I join you?"',
+    'how many programmers does it take to change a light bulb? none, that\'s a hardware problem.',
+    'it works on my machine. – then we ship your machine.',
+    'why did the developer go broke? because they used up all their cache.',
+    '!false – it\'s funny because it\'s true.',
+    'debugging: being the detective in a crime movie where you are also the murderer.',
+  ];
+  function busy(on){ inp.disabled = on; if(!on) inp.focus({preventScroll:true}); }
+  function store(k, v){ try { return v === undefined ? localStorage.getItem(k) : localStorage.setItem(k, v); } catch { return null; } }
   const run = raw => {
     print(`<span class="ps">aurel@github:~$</span> ${esc(raw)}`);
     const [c, ...rest] = raw.trim().split(/\s+/); if(!c) return;
@@ -460,6 +600,111 @@ document.getElementById('yr').textContent = new Date().getFullYear();
     else if(e.key==='Tab'){ e.preventDefault(); const m = Object.keys(CMDS).find(k=>k.startsWith(inp.value)); if(m) inp.value = m; }
   });
   body.addEventListener('click', () => inp.focus({preventScroll:true}));
+})();
+
+/* ---------- Easter eggs ---------- */
+window.eggs = (() => {
+  const toast = (html, ms=4500) => {
+    const t = document.createElement('div'); t.className = 'toast'; t.innerHTML = html;
+    t.style.bottom = (28 + 70*document.querySelectorAll('.toast').length) + 'px'; document.body.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('on'));
+    setTimeout(() => { t.classList.remove('on'); setTimeout(() => t.remove(), 500); }, ms);
+  };
+  const bigMsg = text => {
+    const m = document.createElement('div'); m.className = 'big-msg'; m.textContent = text; document.body.appendChild(m);
+    setTimeout(() => m.remove(), 2600);
+  };
+
+  // rm -rf / → everything falls down, blue screen, reboot
+  let melting = false;
+  const meltdown = async () => {
+    if(melting) return; melting = true;
+    await sleep(600);
+    const els = [...document.querySelectorAll('nav, .hero-inner, .sec-title, .filters, .window, .card, .stat, .contact a, .hint, footer p')];
+    els.forEach(el => { el.style.setProperty('--r', (Math.random()*80-40)+'deg'); el.style.setProperty('--dl', (Math.random()*.6)+'s'); el.classList.add('fall'); });
+    await sleep(2300);
+    const b = document.createElement('div'); b.id = 'bsod';
+    b.innerHTML = '<div class="face">:(</div><p>Your homepage ran into a problem and needs to restart.</p><p><span id="pct">0</span>% complete</p><small>Stop code: USER_TYPED_RM_RF<br>(relax, nothing was actually deleted)</small>';
+    document.body.appendChild(b);
+    for(let p=0;p<=100;p+=Math.ceil(Math.random()*9)){ b.querySelector('#pct').textContent = p; await sleep(70); }
+    b.querySelector('#pct').textContent = 100; await sleep(500);
+    els.forEach(el => el.classList.remove('fall'));
+    b.remove(); scrollTo({top:0, behavior:'instant'});
+    toast('system restored. please don\'t do that again.');
+    melting = false;
+  };
+
+  // Konami code → arcade mode (fragment 2)
+  const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  let kp = 0;
+  addEventListener('keydown', e => {
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    kp = k === KONAMI[kp] ? kp+1 : (k === KONAMI[0] ? 1 : 0);
+    if(kp < KONAMI.length) return;
+    kp = 0;
+    const on = document.body.classList.toggle('arcade');
+    window.MCOL = on ? ['#ff3df0', '#8a1f9e'] : ['#39ff7a', '#1f9e48'];
+    toast(on ? 'ARCADE MODE: ON<br><small>fragment 2/3: <b>TCH</b></small>' : 'ARCADE MODE: OFF');
+  });
+
+  // Logo clicked 5x → spaceship attack (fragment 3)
+  let clicks = 0, clickTimer, flying = false;
+  document.querySelector('.logo').addEventListener('click', () => {
+    clearTimeout(clickTimer); clickTimer = setTimeout(() => clicks = 0, 1200);
+    if(++clicks >= 5 && !flying){ clicks = 0; launchShip(); }
+  });
+  const SHIP = ['....##....','...####...','...#..#...','..######..','.##.##.##.','##########','#.#....#.#'];
+  function launchShip(){
+    flying = true;
+    const cv = document.createElement('canvas'); cv.id = 'ship'; document.body.appendChild(cv);
+    const g = cv.getContext('2d'), P = 4;
+    cv.width = innerWidth; cv.height = innerHeight;
+    const col = getComputedStyle(document.body).getPropertyValue('--green').trim();
+    let x = -50, f = 0, hits = 0;
+    const bullets = [], sparks = [];
+    const frame = () => {
+      g.clearRect(0,0,cv.width,cv.height);
+      const y = cv.height - 90 + Math.sin(f/10)*8;
+      g.fillStyle = col;
+      SHIP.forEach((row,r) => [...row].forEach((c,i) => c==='#' && g.fillRect(x+i*P, y+r*P, P, P)));
+      if(f % 12 === 0 && x > 0 && x < cv.width) bullets.push({x:x+4.5*P, y});
+      for(let i=bullets.length-1;i>=0;i--){
+        const b = bullets[i]; b.y -= 13;
+        g.fillRect(b.x, b.y, 3, 12);
+        const el = document.elementFromPoint(b.x, b.y);
+        const target = el && el.closest('.card, .window, .stat, .contact a, .btn, .sec-title');
+        if(target || b.y < 0){
+          bullets.splice(i,1);
+          if(target){
+            hits++;
+            target.classList.remove('hit'); void target.offsetWidth; target.classList.add('hit');
+            setTimeout(() => target.classList.remove('hit'), 400);
+            for(let k=0;k<10;k++) sparks.push({x:b.x, y:b.y, vx:Math.random()*6-3, vy:Math.random()*6-3, l:20});
+          }
+        }
+      }
+      g.fillStyle = '#ff4d6d';
+      for(let i=sparks.length-1;i>=0;i--){ const s = sparks[i]; s.x += s.vx; s.y += s.vy; if(--s.l < 0){ sparks.splice(i,1); continue; } g.fillRect(s.x, s.y, 3, 3); }
+      x += 4; f++;
+      if(x < cv.width + 60 || bullets.length || sparks.length) return requestAnimationFrame(frame);
+      cv.remove(); flying = false;
+      toast(`${hits} hits!<br><small>fragment 3/3: <b>3D</b></small>`);
+    };
+    requestAnimationFrame(frame);
+  }
+
+  // Message for curious developers (fragment 1)
+  console.log(`%c
+   █████╗ ██╗   ██╗██████╗ ███████╗██╗
+  ██╔══██╗██║   ██║██╔══██╗██╔════╝██║
+  ███████║██║   ██║██████╔╝█████╗  ██║
+  ██╔══██║██║   ██║██╔══██╗██╔══╝  ██║
+  ██║  ██║╚██████╔╝██║  ██║███████╗███████╗
+  ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝`, 'color:#39ff7a;font-family:monospace');
+  console.log('%cHey, curious developer! You found the first secret.\n\nfragment 1/3: GL1\n\nThere are 3 fragments hidden on this page. Combine them and type "unlock <code>" in the terminal.',
+    'color:#39ff7a;font-family:monospace;font-size:13px');
+
+  return {toast, bigMsg, meltdown};
 })();
 </script>
 </body>
