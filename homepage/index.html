@@ -214,7 +214,7 @@ footer .g{color:var(--green)}
       <div class="body about-text">
         <p>Hi, I'm <span class="hl">Aurel</span> 👋 – a developer who loves turning ideas into <span class="hl">playable games</span> and useful tools.</p>
         <p>Most of my projects are games: from pixel-art shooters and stickman fights to zombie survival, farming and strategy board games like Quoridor and Battleship with an <span class="hl">AI opponent</span>.</p>
-        <p>I work with <span class="hl">Python</span>, <span class="hl">JavaScript</span> and <span class="hl">TypeScript</span>, I've done an <span class="hl">internship at NVIDIA</span>, and I like experimenting with AI-assisted development.</p>
+        <p>I work with <span class="hl">Python</span>, <span class="hl">JavaScript</span> and <span class="hl">TypeScript</span> and I like experimenting with AI-assisted development.</p>
         <p>Currently: building new games and learning something new every day.</p>
         <div class="stats">
           <div class="stat"><b data-count="11">0</b><span>repositories</span></div>
@@ -339,7 +339,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   document.getElementById('name').classList.add('on');
   await sleep(350);
   document.getElementById('cta').classList.add('on');
-  const roles = ['Developer.', 'Game Creator.', 'Python · JavaScript · TypeScript', 'ex-NVIDIA intern.', 'Always building something new.'];
+  const roles = ['Developer.', 'Game Creator.', 'Python · JavaScript · TypeScript', 'Always building something new.'];
   const el = document.getElementById('role');
   for(let i=0;;i=(i+1)%roles.length){
     const r = roles[i];
@@ -428,7 +428,7 @@ document.getElementById('yr').textContent = new Date().getFullYear();
   <span class="g">matrix</span>       enter the matrix
   <span class="g">date</span>         current date
   <span class="g">clear</span>        clear the screen`),
-    whoami: () => print('Aurel Schenkl – developer &amp; game creator. Python, JavaScript, TypeScript. ex-NVIDIA intern.'),
+    whoami: () => print('Aurel Schenkl – developer &amp; game creator. Python, JavaScript, TypeScript.'),
     projects: () => print(PROJECTS.map(p => `<span class="a">${p.icon}</span> <a class="g" href="${GH+p.name}" target="_blank" rel="noopener">${p.name.padEnd(22)}</a> ${p.lang}`).join('\n')),
     ls: () => CMDS.projects(),
     skills: () => print(Object.values(SK).flat().map(([n,v]) => `${n.padEnd(20)} <span class="g">${'█'.repeat(Math.round(v/10))}</span>${'░'.repeat(10-Math.round(v/10))} ${v}%`).join('\n')),
