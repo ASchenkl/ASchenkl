@@ -938,10 +938,11 @@ window.eggs = (() => {
     const C1 = css.getPropertyValue('--green').trim(), C2 = css.getPropertyValue('--cyan').trim(), C3 = css.getPropertyValue('--amber').trim();
     const BP = W < 600 ? 4 : 6, bw = 16*BP, bh = 12*BP;
     const font = px => `${px}px "Press Start 2P", monospace`;
-    const pl = {x:W/2, y:H-70, lives:3, inv:0, cd:0, rapid:0, triple:0, shield:false};
+    const pl = {x:W/2, y:H-70, lives:3, inv:0, cd:0};
     const keys = {};
-    // power-ups: L = extra life, R = rapid fire, 3 = triple shot, S = shield
-    const UPS = {L:{c:'#ff4d6d', name:'EXTRA LIFE'}, R:{c:'#f9f871', name:'RAPID FIRE'}, 3:{c:'#05d9e8', name:'TRIPLE SHOT'}, S:{c:'#b48cff', name:'SHIELD'}};
+    // power-ups, all temporary: R = rapid fire, D = double damage, S = speed, I = invincible
+    const UPS = {R:{c:'#f9f871', name:'RAPID FIRE'}, D:{c:'#ff4d6d', name:'DOUBLE DAMAGE'}, S:{c:'#05d9e8', name:'SPEED BOOST'}, I:{c:'#b48cff', name:'INVINCIBLE'}};
+    const UP_TIME = 480, pw = {R:0, D:0, S:0, I:0};
     let ups = [], upMsg = '', upMsgT = 0;
     let shots = [], bombs = [], sparks = [], boss = null, stage = 'story', t = 0, st = 0, score = 0, line = 0, raf;
     // digital rain behind the story, drawn on its own canvas so it can leave trails
@@ -1014,20 +1015,20 @@ window.eggs = (() => {
       const live = stage === 'boss';
       // player
       if(live){
-        if(keys.ArrowLeft || keys.a) pl.x -= 7;
-        if(keys.ArrowRight || keys.d) pl.x += 7;
+        const sp = pw.S > 0 ? 13 : 7;
+        if(keys.ArrowLeft || keys.a) pl.x -= sp;
+        if(keys.ArrowRight || keys.d) pl.x += sp;
         if(touchX !== null) pl.x += (touchX - pl.x) * .2;
         pl.x = Math.max(22, Math.min(W-22, pl.x));
         if(--pl.cd <= 0 && (keys[' '] || touchX !== null)){
-          (pl.triple > 0 ? [-3,0,3] : [0]).forEach(vx => shots.push({x:pl.x, y:pl.y, vx}));
-          pl.cd = pl.rapid > 0 ? 6 : 14; chip([[880,.04]]);
+          shots.push({x:pl.x, y:pl.y, big:pw.D > 0});
+          pl.cd = pw.R > 0 ? 6 : 14; chip([[880,.04]]);
         }
         if(pl.inv > 0) pl.inv--;
-        if(pl.rapid > 0) pl.rapid--;
-        if(pl.triple > 0) pl.triple--;
+        for(const k in pw) if(pw[k] > 0) pw[k]--;
       }
-      if(stage !== 'story' && stage !== 'emerge' && pl.inv % 10 < 6) sprite(g, SHIP, pl.x - 5*4, pl.y, 4, C2);
-      if(pl.shield && stage === 'boss'){ g.strokeStyle = UPS.S.c; g.lineWidth = 2; g.beginPath(); g.arc(pl.x, pl.y + 14, 30 + Math.sin(t/6)*2, 0, Math.PI*2); g.stroke(); g.lineWidth = 1; }
+      if(stage !== 'story' && stage !== 'emerge' && pl.inv % 10 < 6)
+        sprite(g, SHIP, pl.x - 5*4, pl.y, 4, pw.I > 0 ? `hsl(${t*12 % 360},100%,65%)` : C2);
       // boss
       if(boss && live){
         boss.x = W/2 - bw/2 + Math.sin(t/95) * (W/2 - bw/2 - 20);
@@ -1047,10 +1048,10 @@ window.eggs = (() => {
       // player shots
       g.fillStyle = C3;
       shots = shots.filter(b => {
-        b.y -= 18; b.x += b.vx || 0; g.fillRect(b.x-1.5, b.y, 3, 16);
+        b.y -= 18; g.fillStyle = b.big ? '#ff4d6d' : C3; g.fillRect(b.x - (b.big ? 3 : 1.5), b.y, b.big ? 6 : 3, 16);
         if(b.y < -16) return false;
         if(boss && live && b.x > boss.x && b.x < boss.x+bw && b.y > boss.y && b.y < boss.y+bh){
-          boss.hp--; boss.flash = 6; score += 50; boom(b.x, b.y, '#fff', 5); chip([[180,.05]]);
+          boss.hp -= b.big ? 2 : 1; boss.flash = 6; score += b.big ? 100 : 50; boom(b.x, b.y, '#fff', 5); chip([[180,.05]]);
           if(boss.hp <= 0){
             score += 5000; for(let k=0;k<6;k++) boom(boss.x + Math.random()*bw, boss.y + Math.random()*bh, [C1,C2,C3][k%3], 25);
             setStage('win'); chip([[523,.15],[659,.15],[784,.15],[1047,.3],[784,.15],[1047,.6]]);
@@ -1064,7 +1065,7 @@ window.eggs = (() => {
       bombs = bombs.filter(b => {
         b.x += b.vx; b.y += b.vy; g.fillRect(b.x-2, b.y, 4, 10);
         if(live && pl.inv === 0 && hitsPlayer(b)){
-          if(pl.shield){ pl.shield = false; pl.inv = 40; boom(pl.x, pl.y+14, UPS.S.c, 16); chip([[300,.08],[200,.1]]); return false; }
+          if(pw.I > 0){ boom(b.x, b.y, UPS.I.c, 6); return false; }
           pl.lives--; pl.inv = 90; boom(pl.x, pl.y+14, C2, 20); chip([[150,.1],[100,.2]]);
           if(pl.lives <= 0) setStage('over');
           return false;
@@ -1080,10 +1081,7 @@ window.eggs = (() => {
         g.fillStyle = '#0d0221'; g.fillRect(u.x - 9, u.y - 9, 18, 18);
         g.fillStyle = c; g.font = font(10); g.textAlign = 'center'; g.fillText(u.k, u.x + 1, u.y + 6); g.textAlign = 'left';
         if(live && Math.abs(u.x - pl.x) < 30 && u.y > pl.y - 10 && u.y < pl.y + 40){
-          if(u.k === 'L') pl.lives = Math.min(5, pl.lives + 1);
-          if(u.k === 'R') pl.rapid = 480;
-          if(u.k === '3') pl.triple = 480;
-          if(u.k === 'S') pl.shield = true;
+          pw[u.k] = UP_TIME;
           upMsg = UPS[u.k].name; upMsgT = 90; score += 250;
           chip([[660,.06],[880,.06],[1320,.12]]); boom(u.x, u.y, c, 12);
           return false;
@@ -1096,7 +1094,7 @@ window.eggs = (() => {
         g.font = font(W < 600 ? 8 : 11); g.fillStyle = '#fff';
         g.fillText(`SCORE ${String(score).padStart(6,'0')}`, 14, H - 14);
         g.textAlign = 'right'; g.fillText(`LIVES ${'♥'.repeat(Math.max(0, pl.lives))}`, W - 14, H - 14);
-        const act = [pl.rapid > 0 && 'RAPID', pl.triple > 0 && 'TRIPLE', pl.shield && 'SHIELD'].filter(Boolean).join(' · ');
+        const act = Object.keys(pw).filter(k => pw[k] > 0).map(k => `${UPS[k].name} ${Math.ceil(pw[k]/60)}`).join(' · ');
         if(act){ g.textAlign = 'center'; g.fillStyle = C3; g.fillText(act, W/2, H - 14); g.fillStyle = '#fff'; }
         g.fillStyle = '#8a78a8'; g.fillText('ESC = flee', W - 14, 20); g.textAlign = 'left';
       }
