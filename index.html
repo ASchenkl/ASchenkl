@@ -555,7 +555,6 @@ document.getElementById('yr').textContent = new Date().getFullYear();
   <span class="g">snake</span>        play snake
   <span class="g">hack</span>         hack the mainframe
   <span class="g">joke</span>         tell a programmer joke
-  <span class="g">coffee</span>       brew some coffee
   <span class="g">cowsay</span> &lt;txt&gt; let the cow talk
   <span class="g">date</span>         current date
   <span class="g">clear</span>        clear the screen
@@ -590,17 +589,6 @@ document.getElementById('yr').textContent = new Date().getFullYear();
     exit: () => print('there is no escape.'),
     rm: () => { print('deleting everything...', 'err'); window.eggs.meltdown(); },
     joke: () => print(JOKES[Math.random()*JOKES.length|0], 'a'),
-    coffee: async () => {
-      busy(true); print('brewing coffee...');
-      await sleep(900);
-      print(`      ( (
-       ) )
-    .........
-    |       |]
-    \\       /
-     \`-----'`, 'a');
-      print('here you go. java, freshly brewed.'); busy(false);
-    },
     cowsay: a => {
       const t = a || 'moo. type help';
       print(esc(` ${'_'.repeat(t.length+2)}
@@ -1081,7 +1069,7 @@ window.eggs = (() => {
         g.fillStyle = '#0d0221'; g.fillRect(u.x - 9, u.y - 9, 18, 18);
         g.fillStyle = c; g.font = font(10); g.textAlign = 'center'; g.fillText(u.k, u.x + 1, u.y + 6); g.textAlign = 'left';
         if(live && Math.abs(u.x - pl.x) < 30 && u.y > pl.y - 10 && u.y < pl.y + 40){
-          pw[u.k] = UP_TIME;
+          pw[u.k] = u.k === 'I' ? 600 : UP_TIME;
           upMsg = UPS[u.k].name; upMsgT = 90; score += 250;
           chip([[660,.06],[880,.06],[1320,.12]]); boom(u.x, u.y, c, 12);
           return false;
