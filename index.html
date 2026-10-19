@@ -1019,8 +1019,8 @@ window.eggs = (() => {
         sprite(g, SHIP, pl.x - 5*4, pl.y, 4, pw.I > 0 ? `hsl(${t*12 % 360},100%,65%)` : C2);
       // boss
       if(boss && live){
-        boss.x = W/2 - bw/2 + Math.sin(t/95) * (W/2 - bw/2 - 20);
-        boss.y = 70 + Math.sin(t/40)*14;
+        boss.x = W/2 - bw/2 + Math.sin(t/130) * (W/2 - bw/2 - 20);
+        boss.y = 70 + Math.sin(t/55)*12;
         if(t % 70 === 0) [-1.5,0,1.5].forEach(vx => bombs.push({x:boss.x + bw/2, y:boss.y + bh, vx, vy:3.8}));
         // the bug drops a random power-up every few seconds
         if(t % 300 === 150){ const keys = Object.keys(UPS); ups.push({x:boss.x + bw/2, y:boss.y + bh, k:keys[Math.random()*keys.length|0]}); }
@@ -1033,11 +1033,19 @@ window.eggs = (() => {
         g.strokeStyle = C1; g.strokeRect(W/2 - bwBar/2, 34, bwBar, 10);
         g.fillStyle = C1; g.fillRect(W/2 - bwBar/2 + 2, 36, (bwBar-4) * boss.hp/boss.max, 6);
       }
+      // power-ups are collected by touching OR shooting them
+      const collect = u => {
+        pw[u.k] = u.k === 'I' ? 600 : UP_TIME;
+        upMsg = UPS[u.k].name; upMsgT = 90; score += 250;
+        chip([[660,.06],[880,.06],[1320,.12]]); boom(u.x, u.y, UPS[u.k].c, 12);
+      };
       // player shots
       g.fillStyle = C3;
       shots = shots.filter(b => {
         b.y -= 18; g.fillStyle = b.big ? '#ff4d6d' : C3; g.fillRect(b.x - (b.big ? 3 : 1.5), b.y, b.big ? 6 : 3, 16);
         if(b.y < -16) return false;
+        const ui = live ? ups.findIndex(u => Math.abs(b.x - u.x) < 14 && b.y < u.y + 12 && b.y + 16 > u.y - 12) : -1;
+        if(ui >= 0){ collect(ups[ui]); ups.splice(ui, 1); return false; }
         if(boss && live && b.x > boss.x && b.x < boss.x+bw && b.y > boss.y && b.y < boss.y+bh){
           boss.hp -= b.big ? 2 : 1; boss.flash = 6; score += b.big ? 100 : 50; boom(b.x, b.y, '#fff', 5); chip([[180,.05]]);
           if(boss.hp <= 0){
@@ -1069,9 +1077,7 @@ window.eggs = (() => {
         g.fillStyle = '#0d0221'; g.fillRect(u.x - 9, u.y - 9, 18, 18);
         g.fillStyle = c; g.font = font(10); g.textAlign = 'center'; g.fillText(u.k, u.x + 1, u.y + 6); g.textAlign = 'left';
         if(live && Math.abs(u.x - pl.x) < 30 && u.y > pl.y - 10 && u.y < pl.y + 40){
-          pw[u.k] = u.k === 'I' ? 600 : UP_TIME;
-          upMsg = UPS[u.k].name; upMsgT = 90; score += 250;
-          chip([[660,.06],[880,.06],[1320,.12]]); boom(u.x, u.y, c, 12);
+          collect(u);
           return false;
         }
         return u.y < H + 20;
