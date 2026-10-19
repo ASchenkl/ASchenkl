@@ -505,7 +505,7 @@ const SK = {
   'sk-focus': [['Game Development',90],['Game AI & Logic',70],['Web Development',75],['AI-assisted Coding',85],['Piano',70]],
 };
 const BLOCKS = 24;
-const SPOKEN = [['German',100],['English',80],['Latin',60]];
+const SPOKEN = [['German',100],['English',80],['Latin',40]];
 const skillRows = list => list.map(([n,v]) =>
   `<div class="skill"><div class="lbl"><span>${n}</span><span>${v}%</span></div><div class="track" data-v="${v}"><span class="full"></span><span class="empty">${'░'.repeat(BLOCKS)}</span></div></div>`).join('');
 for(const [id,list] of Object.entries(SK)) document.getElementById(id).innerHTML = skillRows(list);
