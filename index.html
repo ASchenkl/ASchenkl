@@ -133,8 +133,8 @@ section{padding:clamp(70px,10vw,120px) clamp(16px,5vw,48px);max-width:1180px;mar
 .skill{margin-bottom:16px}
 .skill .lbl{display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px}
 .skill .lbl span:last-child{color:var(--dim)}
-.spoken{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:22px;padding-top:16px;border-top:1px dashed var(--border);font-size:.85rem}
-.spoken .lbl2{color:var(--cyan);margin-right:4px}
+.spoken{margin:22px 0 14px;padding-top:14px;border-top:1px dashed var(--border);font-size:.8rem}
+.spoken .lbl2{color:var(--cyan)}
 .track{font-size:.9rem;letter-spacing:-.05em;color:var(--green);white-space:nowrap;overflow:hidden}
 .track .empty{color:#1d3a24}
 
@@ -504,16 +504,14 @@ document.getElementById('filters').addEventListener('click', e => {
 /* ---------- Skills ---------- */
 const SK = {
   'sk-lang': [['Python',80],['JavaScript',85],['TypeScript',70],['HTML / CSS',80]],
-  'sk-focus': [['Game Development',90],['Game AI & Logic',70],['Web Development',75],['AI-assisted Coding',85]],
+  'sk-focus': [['Game Development',90],['Game AI & Logic',70],['Web Development',75],['AI-assisted Coding',85],['Piano',70]],
 };
 const BLOCKS = 24;
-for(const [id,list] of Object.entries(SK)){
-  document.getElementById(id).innerHTML = list.map(([n,v]) =>
-    `<div class="skill"><div class="lbl"><span>${n}</span><span>${v}%</span></div><div class="track" data-v="${v}"><span class="full"></span><span class="empty">${'░'.repeat(BLOCKS)}</span></div></div>`).join('');
-}
-const SPOKEN = ['German', 'English', 'Latin'];
-document.getElementById('sk-lang').insertAdjacentHTML('beforeend',
-  `<div class="spoken"><span class="lbl2">spoken:</span>${SPOKEN.map(l => `<span class="tag">${l}</span>`).join('')}</div>`);
+const SPOKEN = [['German',100],['English',80],['Latin',60]];
+const skillRows = list => list.map(([n,v]) =>
+  `<div class="skill"><div class="lbl"><span>${n}</span><span>${v}%</span></div><div class="track" data-v="${v}"><span class="full"></span><span class="empty">${'░'.repeat(BLOCKS)}</span></div></div>`).join('');
+for(const [id,list] of Object.entries(SK)) document.getElementById(id).innerHTML = skillRows(list);
+document.getElementById('sk-lang').insertAdjacentHTML('beforeend', `<div class="spoken"><span class="lbl2">spoken</span></div>${skillRows(SPOKEN)}`);
 function fillBar(t){
   const n = Math.round(+t.dataset.v/100*BLOCKS); let k = 0;
   const full = t.querySelector('.full'), empty = t.querySelector('.empty');
@@ -578,7 +576,7 @@ document.getElementById('yr').textContent = new Date().getFullYear();
     },
     run: a => CMDS.play(a),
     ls: () => CMDS.projects(),
-    skills: () => print(Object.values(SK).flat().map(([n,v]) => `${n.padEnd(20)} <span class="g">${'█'.repeat(Math.round(v/10))}</span>${'░'.repeat(10-Math.round(v/10))} ${v}%`).join('\n') + `\n${'spoken'.padEnd(20)} ${SPOKEN.join(', ')}`),
+    skills: () => print([...Object.values(SK).flat(), ...SPOKEN].map(([n,v]) => `${n.padEnd(20)} <span class="g">${'█'.repeat(Math.round(v/10))}</span>${'░'.repeat(10-Math.round(v/10))} ${v}%`).join('\n')),
     github: () => { print('opening github.com/ASchenkl ...'); open(GH.slice(0,-1),'_blank'); },
     open: a => {
       if(!a) return print('usage: open &lt;project&gt;', 'err');
