@@ -178,6 +178,8 @@ footer .g{color:var(--green)}
 @keyframes hit{0%,100%{transform:none}20%{transform:translate(-5px,2px)}40%{transform:translate(5px,-2px)}60%{transform:translate(-3px,1px)}80%{transform:translate(3px,0)}}
 .hit{border-color:var(--red)!important;box-shadow:0 0 30px rgba(255,77,109,.5)!important}
 #ship{position:fixed;inset:0;width:100%;height:100%;z-index:90;pointer-events:none}
+#saver{position:fixed;inset:0;width:100%;height:100%;z-index:125;background:#000;cursor:none;opacity:0;transition:opacity .8s}
+#saver.on{opacity:1}
 #boss{position:fixed;inset:0;width:100%;height:100%;z-index:117;cursor:none;touch-action:none}
 #grav-layer{position:fixed;inset:0;z-index:95;cursor:grab;touch-action:none}
 #grav-layer:active{cursor:grabbing}
@@ -612,6 +614,13 @@ then type: <span class="g">unlock</span> &lt;fragment1+fragment2+fragment3&gt;`,
     f ? f(rest.join(' ')) : print(`command not found: ${esc(c)} – type <span class="g">help</span>`, 'err');
   };
   print('Welcome to aurel-OS v1.0 – type <span class="g">help</span> to get started.');
+  // night owl: visitors between midnight and 5 am get a reminder
+  const now = new Date();
+  if(now.getHours() < 5){
+    const hm = now.toTimeString().slice(0,5);
+    print(`🦉 it's ${hm}. shouldn't you be sleeping?`, 'a');
+    setTimeout(() => window.eggs.toast(`🦉 it's ${hm}. shouldn't you be sleeping?`, 6000), 3500);
+  }
   // Tab completion: commands, and project names after open/play/run. Secret commands stay secret.
   const SECRET = new Set(['rm', 'sudo', 'exit', 'ls', 'run']);
   const complete = () => {
@@ -1001,7 +1010,68 @@ window.eggs = (() => {
     document.documentElement.style.overflow = '';
   };
 
-  return {toast, bigMsg, meltdown, bossFight, gravity};
+  // screensaver: after 60 s without input the logo bounces around like the old DVD logo.
+  // hitting a corner exactly earns confetti. any input ends it.
+  const SAVER_AFTER = 60000;
+  let saverTimer, saver = null;
+  const busyNow = () => document.getElementById('boss') || document.getElementById('bsod') ||
+    document.documentElement.classList.contains('grav') || document.getElementById('tin').disabled;
+  const resetSaver = () => {
+    if(saver) stopSaver();
+    clearTimeout(saverTimer);
+    saverTimer = setTimeout(() => busyNow() ? resetSaver() : startSaver(), SAVER_AFTER);
+  };
+  const startSaver = () => {
+    const cv = document.createElement('canvas'); cv.id = 'saver'; document.body.appendChild(cv);
+    const g = cv.getContext('2d'), W = cv.width = innerWidth, H = cv.height = innerHeight;
+    const COLS = ['#39ff7a', '#3df0ff', '#ffc53d', '#ff4d6d', '#b48cff', '#ffffff'];
+    const text = '>_ aurel', fsz = W < 600 ? 28 : 46;
+    g.font = `800 ${fsz}px "JetBrains Mono", monospace`;
+    const bw = g.measureText(text).width + 36, bh = fsz + 28;
+    let x = Math.random() * (W - bw), y = Math.random() * (H - bh), vx = 2.2, vy = 1.8, col = 0, corners = 0, flash = 0, raf;
+    const bits = [];
+    const frame = () => {
+      g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+      x += vx; y += vy;
+      let hx = false, hy = false;
+      if(x <= 0 || x + bw >= W){ vx = -vx; x = Math.max(0, Math.min(W - bw, x)); hx = true; }
+      if(y <= 0 || y + bh >= H){ vy = -vy; y = Math.max(0, Math.min(H - bh, y)); hy = true; }
+      // a corner counts if the other wall is within a few pixels at the moment of the bounce
+      const nearX = x < 6 || x + bw > W - 6, nearY = y < 6 || y + bh > H - 6;
+      if((hx && nearY) || (hy && nearX)){
+        corners++; flash = 120;
+        for(let k=0;k<160;k++) bits.push({x:x + bw/2, y:y + bh/2, vx:Math.random()*14-7, vy:Math.random()*-14, c:COLS[k % COLS.length], l:120});
+        chip([[523,.1],[659,.1],[784,.1],[1047,.3]]);
+      }
+      if(hx || hy) col = (col + 1) % COLS.length;
+      const c = COLS[col];
+      g.strokeStyle = c; g.lineWidth = 3; g.shadowColor = c; g.shadowBlur = 18;
+      g.strokeRect(x, y, bw, bh);
+      g.fillStyle = c; g.font = `800 ${fsz}px "JetBrains Mono", monospace`; g.textBaseline = 'middle';
+      g.fillText(text, x + 18, y + bh/2 + 2);
+      g.shadowBlur = 0;
+      for(let i = bits.length - 1; i >= 0; i--){
+        const b = bits[i]; b.x += b.vx; b.y += b.vy; b.vy += .35;
+        g.fillStyle = b.c; g.fillRect(b.x, b.y, 6, 6);
+        if(--b.l < 0 || b.y > H) bits.splice(i, 1);
+      }
+      if(flash > 0){
+        flash--; g.textAlign = 'center'; g.fillStyle = COLS[(flash >> 3) % COLS.length];
+        g.font = `${W < 600 ? 18 : 30}px "Press Start 2P", monospace`; g.fillText('CORNER HIT!', W/2, H/2);
+        g.textAlign = 'left';
+      }
+      if(corners){ g.font = '12px "JetBrains Mono", monospace'; g.fillStyle = '#555'; g.fillText(`corner hits: ${corners}`, 14, H - 16); }
+      raf = requestAnimationFrame(frame);
+    };
+    saver = {cv, stop:() => cancelAnimationFrame(raf)};
+    requestAnimationFrame(() => cv.classList.add('on'));
+    raf = requestAnimationFrame(frame);
+  };
+  const stopSaver = () => { const sv = saver; saver = null; sv.stop(); sv.cv.remove(); };
+  ['mousemove', 'mousedown', 'keydown', 'touchstart', 'wheel', 'scroll'].forEach(ev => addEventListener(ev, resetSaver, {passive:true}));
+  resetSaver();
+
+  return {toast, bigMsg, meltdown, bossFight, gravity, startSaver};
 })();
 </script>
 </body>
